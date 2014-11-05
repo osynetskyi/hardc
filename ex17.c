@@ -128,8 +128,8 @@ void Database_write(struct Connection *conn)
 		struct Address *row = conn->db->rows[i];
 		fwrite(&row->id, sizeof(int), 1, conn->file);
 		fwrite(&row->set, sizeof(int), 1, conn->file);
-		fwrite(row->name, conn->db->MAX_DATA * sizeof(char), 1, conn->file);
-		fwrite(row->email, conn->db->MAX_DATA * sizeof(char), 1, conn->file);
+		fwrite(row->name, conn->db->MAX_DATA * sizeof(*row->name), 1, conn->file);
+		fwrite(row->email, conn->db->MAX_DATA * sizeof(*row->name), 1, conn->file);
 	}
 
 	/*int rc = fwrite(conn->db, sizeof(struct Database), 1, conn->file);
@@ -141,11 +141,11 @@ void Database_write(struct Connection *conn)
 void Database_create(struct Connection *conn, int MAX_ROWS, int MAX_DATA)
 {
 	int i = 0;
-	conn->db->rows = (struct Address **) malloc(MAX_ROWS * (sizeof(struct Address *)));
 	conn->db->MAX_ROWS = MAX_ROWS;
 	conn->db->MAX_DATA = MAX_DATA;
-
-	for(i = 0; i < MAX_ROWS; i++) {
+	conn->db->rows = (struct Address **) malloc(conn->db->MAX_ROWS * (sizeof(struct Address *)));
+	
+	for(i = 0; i < conn->db->MAX_ROWS; i++) {
 		conn->db->rows[i] = (struct Address *) malloc(sizeof(struct Address));
 		conn->db->rows[i]->id = i + 1;
 		conn->db->rows[i]->set = 0;
@@ -157,6 +157,7 @@ void Database_set(struct Connection *conn, int id, const char *name, const char 
 	struct Address *addr = conn->db->rows[id];
 	if(addr->set) die("Already set, delete it first", conn);
 
+	addr->id = id;
 	addr->set = 1;
 	addr->name = malloc(sizeof(char) * conn->db->MAX_DATA);
 	addr->email = malloc(sizeof(char) * conn->db->MAX_DATA);
@@ -191,8 +192,8 @@ void Database_get(struct Connection *conn, int id)
 
 void Database_delete(struct Connection *conn, int id)
 {
-	struct Address addr = {.id = id, .set = 0};
-	conn->db->rows[id] = &addr;
+	conn->db->rows[id]->id = id;
+	conn->db->rows[id]->set = 0;
 }
 
 void Database_list(struct Connection *conn)
