@@ -53,14 +53,18 @@ void Database_load(struct Connection *conn)
 	int i = 0;
 	fread(&conn->db->MAX_ROWS, sizeof(int), 1, conn->file);
 	fread(&conn->db->MAX_DATA, sizeof(int), 1, conn->file);
+	//printf("Allocated memory for rows table\n");
 	conn->db->rows = (struct Address **) malloc(sizeof(struct Address *) * conn->db->MAX_ROWS);
 	for(i = 0; i < conn->db->MAX_ROWS; i++) {
+		//printf("Allocated memory for rows[%d]\n", i);
 		conn->db->rows[i] = (struct Address *) malloc(sizeof(struct Address));
 		struct Address *row = conn->db->rows[i];
 		fread(&row->id, sizeof(int), 1, conn->file);
 		fread(&row->set, sizeof(int), 1, conn->file);
-		row->name = malloc(sizeof(*row->name) * conn->db->MAX_DATA);
-		row->email = malloc(sizeof(*row->email) * conn->db->MAX_DATA);
+		//printf("Allocated memory for rows[%d]->name\n", i);
+		row->name = malloc(sizeof(char) * conn->db->MAX_DATA);
+		//printf("Allocated memory for rows[%d]->email\n", i);
+		row->email = malloc(sizeof(char) * conn->db->MAX_DATA);
 		fread(row->name, conn->db->MAX_DATA * sizeof(char), 1, conn->file);
 		fread(row->email, conn->db->MAX_DATA * sizeof(char), 1, conn->file);
 	}
@@ -70,9 +74,11 @@ void Database_load(struct Connection *conn)
 
 struct Connection *Database_open(const char *filename, char mode)
 {
+	//printf("Allocated memory for connection\n");
 	struct Connection *conn = malloc(sizeof(struct Connection));
 	if(!conn) die("Memory error.", conn);
 
+	//printf("Allocated memory for database\n");
 	conn->db = malloc(sizeof(struct Database));
 	if(!conn->db) die("Memory error.", conn);
 
@@ -101,18 +107,24 @@ void Database_close(struct Connection *conn)
 				for(i = 0; i < conn->db->MAX_ROWS; i++) {
 					if(conn->db->rows[i]) {
 						if(conn->db->rows[i]->name) {
+							//printf("Freed memory from rows[%d]->name\n", i);
 							free(conn->db->rows[i]->name);
 						}
 						if(conn->db->rows[i]->email) {
+							//printf("Freed memory from rows[%d]->email\n", i);
 							free(conn->db->rows[i]->email);
 						}
+						//printf("Freed memory from rows[%d]\n", i);
 						free(conn->db->rows[i]);
 					}
 				}
+				//printf("Freed memory from all rows\n");
 				free(conn->db->rows);
 			}
+			//printf("Freed memory from database\n");
 			free(conn->db);
 		}
+		//printf("Freed memory from connection\n");
 		free(conn);
 	}
 }
@@ -128,8 +140,8 @@ void Database_write(struct Connection *conn)
 		struct Address *row = conn->db->rows[i];
 		fwrite(&row->id, sizeof(int), 1, conn->file);
 		fwrite(&row->set, sizeof(int), 1, conn->file);
-		fwrite(row->name, conn->db->MAX_DATA * sizeof(*row->name), 1, conn->file);
-		fwrite(row->email, conn->db->MAX_DATA * sizeof(*row->name), 1, conn->file);
+		fwrite(row->name, conn->db->MAX_DATA * sizeof(char), 1, conn->file);
+		fwrite(row->email, conn->db->MAX_DATA * sizeof(char), 1, conn->file);
 	}
 
 	/*int rc = fwrite(conn->db, sizeof(struct Database), 1, conn->file);
@@ -138,18 +150,25 @@ void Database_write(struct Connection *conn)
 	if(fflush(conn->file) == -1) die("Cannot flush database", conn);
 }
 
-void Database_create(struct Connection *conn, int MAX_ROWS, int MAX_DATA)
+void Database_create(struct Connection *conn, int MAX_DATA, int MAX_ROWS)
 {
-	int i = 0;
-	conn->db->MAX_ROWS = MAX_ROWS;
-	conn->db->MAX_DATA = MAX_DATA;
-	conn->db->rows = (struct Address **) malloc(conn->db->MAX_ROWS * (sizeof(struct Address *)));
-	
-	for(i = 0; i < conn->db->MAX_ROWS; i++) {
-		conn->db->rows[i] = (struct Address *) malloc(sizeof(struct Address));
-		conn->db->rows[i]->id = i + 1;
-		conn->db->rows[i]->set = 0;
-	}
+        int i = 0;
+        conn->db->MAX_DATA = MAX_DATA;
+        conn->db->MAX_ROWS = MAX_ROWS;
+        conn->db->rows = (struct Address**)malloc(sizeof(struct Address*) * MAX_ROWS);
+ 
+        for(i = 0; i < MAX_ROWS; i++) {
+                conn->db->rows[i] = (struct Address*)malloc(sizeof(struct Address));
+                                conn->db->rows[i]->id = i;
+                                conn->db->rows[i]->set = 0;
+                                conn->db->rows[i]->name = (char *)malloc(conn->db->MAX_DATA);
+                                conn->db->rows[i]->name = (char *)memset(conn->db->rows[i]->name, ' ', conn->db->MAX_DATA);
+								//conn->db->rows[i]->name = "";
+                                conn->db->rows[i]->email= (char *)malloc(conn->db->MAX_DATA);
+                                conn->db->rows[i]->email= (char *)memset(conn->db->rows[i]->email, ' ', conn->db->MAX_DATA);
+								//conn->db->rows[i]->email = "";
+ 
+        }
 }
 
 void Database_set(struct Connection *conn, int id, const char *name, const char *email)
@@ -159,8 +178,6 @@ void Database_set(struct Connection *conn, int id, const char *name, const char 
 
 	addr->id = id;
 	addr->set = 1;
-	addr->name = malloc(sizeof(char) * conn->db->MAX_DATA);
-	addr->email = malloc(sizeof(char) * conn->db->MAX_DATA);
 
 	char *res = strncpy(addr->name, name, conn->db->MAX_DATA);
 	int change = strlen(addr->name);
@@ -200,6 +217,9 @@ void Database_list(struct Connection *conn)
 {
 	int i = 0;
 	struct Database *db = conn->db;
+
+	printf("Max rows: %d\n", db->MAX_ROWS);
+	printf("Max data: %d\n", db->MAX_DATA);
 
 	for(i = 0; i < db->MAX_ROWS; i++) {
 		struct Address *cur = db->rows[i];
