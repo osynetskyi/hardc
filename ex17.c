@@ -10,6 +10,7 @@
 struct Address {
 	int id;
 	int set;
+	int age;
 	//char name[MAX_DATA];
 	char *name;
 	//char email[MAX_DATA];
@@ -44,8 +45,8 @@ void die(const char *message, struct Connection *conn)
 
 void Address_print(struct Address *addr)
 {
-	printf("%d %s %s\n",
-			addr->id, addr->name, addr->email);
+	printf("%d %s %s %d\n",
+			addr->id, addr->name, addr->email, addr->age);
 }
 
 void Database_load(struct Connection *conn)
@@ -68,12 +69,13 @@ void Database_load(struct Connection *conn)
 		struct Address *row = conn->db->rows[i];
 		if(!fread(&row->id, sizeof(int), 1, conn->file)) die("Unable to read from file", conn);
 		if(!fread(&row->set, sizeof(int), 1, conn->file)) die("Unable to read from file", conn);
+		if(!fread(&row->age, sizeof(int), 1, conn->file)) die("Unable to read from file", conn);
 		//printf("Allocated memory for rows[%d]->name\n", i);
 		row->name = malloc(sizeof(char) * conn->db->MAX_DATA);
-		if(row->name) die("Memory error", conn);
+		if(!row->name) die("Memory error", conn);
 		//printf("Allocated memory for rows[%d]->email\n", i);
 		row->email = malloc(sizeof(char) * conn->db->MAX_DATA);
-		if(row->name) die("Memory error", conn);
+		if(!row->name) die("Memory error", conn);
 		if(!fread(row->name, conn->db->MAX_DATA * sizeof(char), 1, conn->file)) 
 			die("Unable to read from file", conn);
 		if(!fread(row->email, conn->db->MAX_DATA * sizeof(char), 1, conn->file)) 
@@ -151,6 +153,7 @@ void Database_write(struct Connection *conn)
 		struct Address *row = conn->db->rows[i];
 		fwrite(&row->id, sizeof(int), 1, conn->file);
 		fwrite(&row->set, sizeof(int), 1, conn->file);
+		fwrite(&row->age, sizeof(int), 1, conn->file);
 		fwrite(row->name, conn->db->MAX_DATA * sizeof(char), 1, conn->file);
 		fwrite(row->email, conn->db->MAX_DATA * sizeof(char), 1, conn->file);
 	}
@@ -172,6 +175,7 @@ void Database_create(struct Connection *conn, int MAX_DATA, int MAX_ROWS)
                 conn->db->rows[i] = (struct Address*)malloc(sizeof(struct Address));
                                 conn->db->rows[i]->id = i;
                                 conn->db->rows[i]->set = 0;
+								conn->db->rows[i]->age = 0;
                                 conn->db->rows[i]->name = (char *)malloc(conn->db->MAX_DATA);
                                 conn->db->rows[i]->name = (char *)memset(conn->db->rows[i]->name, ' ', conn->db->MAX_DATA);
 								//conn->db->rows[i]->name = "";
@@ -182,13 +186,14 @@ void Database_create(struct Connection *conn, int MAX_DATA, int MAX_ROWS)
         }
 }
 
-void Database_set(struct Connection *conn, int id, const char *name, const char *email)
+void Database_set(struct Connection *conn, int id, const char *name, const char *email, const int age)
 {
 	struct Address *addr = conn->db->rows[id];
 	if(addr->set) die("Already set, delete it first", conn);
 
 	addr->id = id;
 	addr->set = 1;
+	addr->age = age;
 
 	char *res = strncpy(addr->name, name, conn->db->MAX_DATA);
 	int change = strlen(addr->name);
@@ -258,6 +263,11 @@ void Database_find(struct Connection *conn, char *attr, char *value)
 				found = 1;
 				Database_get(conn, db->rows[i]->id);
 			}
+		} else if(strcmp(attr, "age") == 0) {
+			if(db->rows[i]->age == atoi(value)) {
+				found = 1;
+				Database_get(conn, db->rows[i]->id);
+			}
 		} else {
 			die("Invalid attribute", conn);
 		}
@@ -293,9 +303,9 @@ int main(int argc, char *argv[])
 			break;
 
 		case 's':
-			if(argc != 6) die("Need id, name, email to set", conn);
+			if(argc != 7) die("Need id, name, email and age to set", conn);
 
-			Database_set(conn, id, argv[4], argv[5]);
+			Database_set(conn, id, argv[4], argv[5], atoi(argv[6]));
 			Database_write(conn);
 			break;
 
