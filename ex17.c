@@ -59,8 +59,8 @@ void Database_load(struct Connection *conn)
 		struct Address *row = conn->db->rows[i];
 		fread(&row->id, sizeof(int), 1, conn->file);
 		fread(&row->set, sizeof(int), 1, conn->file);
-		row->name = malloc(sizeof(*row->name) * conn->db->MAX_DATA);
-		row->email = malloc(sizeof(*row->email) * conn->db->MAX_DATA);
+		row->name = malloc(sizeof(char) * conn->db->MAX_DATA);
+		row->email = malloc(sizeof(char) * conn->db->MAX_DATA);
 		fread(row->name, conn->db->MAX_DATA * sizeof(char), 1, conn->file);
 		fread(row->email, conn->db->MAX_DATA * sizeof(char), 1, conn->file);
 	}
@@ -128,8 +128,8 @@ void Database_write(struct Connection *conn)
 		struct Address *row = conn->db->rows[i];
 		fwrite(&row->id, sizeof(int), 1, conn->file);
 		fwrite(&row->set, sizeof(int), 1, conn->file);
-		fwrite(row->name, conn->db->MAX_DATA * sizeof(*row->name), 1, conn->file);
-		fwrite(row->email, conn->db->MAX_DATA * sizeof(*row->name), 1, conn->file);
+		fwrite(row->name, sizeof(char) * conn->db->MAX_DATA, 1, conn->file);
+		fwrite(row->email, sizeof(char) * conn->db->MAX_DATA, 1, conn->file);
 	}
 
 	/*int rc = fwrite(conn->db, sizeof(struct Database), 1, conn->file);
