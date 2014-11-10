@@ -18,6 +18,7 @@ void die(const char *message)
 // a typedef creates a fake type, in this
 // case for a function pointer
 typedef int (*compare_cb)(int a, int b);
+typedef int *(*sort_cb)(int *target, int count, compare_cb cmp);
 
 /**
  * A classeic bubble sort function that uses the
@@ -47,6 +48,32 @@ int *bubble_sort(int *numbers, int count, compare_cb cmp)
 	return target;
 }
 
+int *selection_sort(int* numbers, int count, compare_cb cmp)
+{
+	int nmin = 0;
+	int i = 0;
+	int j = 0;
+	int temp = 0;
+	int *target = malloc(count * sizeof(int));
+	if(!target) die("Memory error");
+
+	memcpy(target, numbers, count * sizeof(int));
+
+	for(i = 0; i < count; i++) {
+		nmin = i;
+		for(j = i; j < count; j++) {
+			if(cmp(target[j], target[nmin]) < 0) {
+				nmin = j;
+			}
+		}
+		temp = target[i];
+		target[i] = target[nmin];
+		target[nmin] = temp;
+	}
+	
+	return target;
+}
+
 int sorted_order(int a, int b)
 {
 	return a - b;
@@ -66,14 +93,19 @@ int strange_order(int a, int b)
 	}
 }
 
+int wrong_function(int a)
+{
+	return a;
+}
+
 /**
  * Used to test that we are sorting things correctly
  * by doing the sort and printing it out.
  */
-void test_sorting(int *numbers, int count, compare_cb cmp)
+void test_sorting(int *numbers, int count, sort_cb sort, compare_cb cmp)
 {
 	int i = 0;
-	int *sorted = bubble_sort(numbers, count, cmp);
+	int *sorted = sort(numbers, count, cmp);
 
 	if(!sorted) die("Failed to sort as requested.");
 	
@@ -108,9 +140,14 @@ int main(int argc, char *argv[])
 		numbers[i] = atoi(inputs[i]);
 	}
 
-	test_sorting(numbers, count, sorted_order);
-	test_sorting(numbers, count, reverse_order);
-	test_sorting(numbers, count, strange_order);
+	test_sorting(numbers, count, bubble_sort, sorted_order);
+	test_sorting(numbers, count, bubble_sort, reverse_order);
+	test_sorting(numbers, count, bubble_sort, strange_order);
+	test_sorting(numbers, count, selection_sort, sorted_order);
+	test_sorting(numbers, count, selection_sort, reverse_order);
+	test_sorting(numbers, count, selection_sort, strange_order);
+	//test_sorting(numbers, count, wrong_function);
+	//test_sorting(numbers, count, NULL);
 
 	free(numbers);
 
