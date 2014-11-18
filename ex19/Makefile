@@ -13,9 +13,6 @@ test:
 
 clean:
 	rm -f game
-<<<<<<< HEAD
 	rm -f game2
-=======
->>>>>>> 9df67a06f34dad47d2fa765a43910df43df89aad
 	rm -f ex19.o
 	rm -f object.o
