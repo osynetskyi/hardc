@@ -1,12 +1,17 @@
 CFLAGS=-Wall -g
 
-all: ex19
+all: game game2
 
-ex19: object.o
+game2: ex19.o object.o
+
+game: ex19.o object.o
+
+ex19.o: object.o
 
 test: 
 	./test_script.sh
 
 clean:
 	rm -f game
+	rm -f ex19.o
 	rm -f object.o
