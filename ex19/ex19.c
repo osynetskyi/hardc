@@ -107,7 +107,7 @@ int Map_attack(void *self, int damage)
 	return location->_(attack)(location, damage);
 }
 
-int Map_init(void *self)
+/*int Map_init(void *self)
 {
 	Map *map = self;
 
@@ -153,13 +153,13 @@ int Map_init(void *self)
 	map->location = hall;
 
 	return 1;
-}
+}*/
 
-Object MapProto = {
+/*Object MapProto = {
 	.init = Map_init,
 	.move = Map_move,
 	.attack = Map_attack
-};
+};*/
 
 int process_input(Map *game)
 {
@@ -224,7 +224,7 @@ int process_input(Map *game)
 	return 1;
 }
 
-int main(int argc, char *argv[])
+/*int main(int argc, char *argv[])
 {
 	// simple way to setup the randomness
 	srand(time(NULL));
@@ -240,4 +240,4 @@ int main(int argc, char *argv[])
 	}
 
 	return 0;
-}
+}*/
