@@ -3,18 +3,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 #include "ex19.h"
 
 int Monster_attack(void *self, int damage)
 {
+	assert(damage > 0);
 	Monster *monster = self;
 	
-	printf("You attack %s!\n", monster->_(description));
+	printf("You attack %s! You inflict %d damage!\n", monster->_(description), damage);
 
 	monster->hit_points -= damage;
 
 	if(monster->hit_points > 0) {
-		printf("It is still alive.\n");
+		printf("It is still alive, it has %d hp left.\n", monster->hit_points);
 		return 0;
 	} else {
 		printf("It is dead!\n");
@@ -111,22 +113,40 @@ int Map_init(void *self)
 
 	// make some rooms for a small map
 	Room *hall = NEW(Room, "The great Hall");
+	assert(hall != NULL);
 	Room *throne = NEW(Room, "The throne room");
+	assert(throne != NULL);
 	Room *arena = NEW(Room, "The arena, with the minotaur");
+	assert(arena != NULL);
 	Room *kitchen = NEW(Room, "Kitchen, you have the knife now");
+	assert(kitchen != NULL);
+	Room *dungeon = NEW(Room, "A grimdark dungeon, where troll lives");
+	assert(dungeon != NULL);
+	Room *boudoir = NEW(Room, "Princess' boudoir");
+	assert(boudoir != NULL);
 
 	// put the bad guy in the arena
 	arena->bad_guy = NEW(Monster, "The evil minotaur");
+	assert(arena->bad_guy != NULL);
+	dungeon->bad_guy = NEW(Monster, "The cave troll");
+	assert(dungeon->bad_guy != NULL);
+	boudoir->bad_guy = NEW(Monster, "The nymphomaniac princess");
+	assert(boudoir->bad_guy != NULL);
 
 	// setup the map rooms
 	hall->north = throne;
+	hall->east = dungeon;
 
 	throne->west = arena;
 	throne->east = kitchen;
 	throne->south = hall;
+	throne->north = boudoir;
 
 	arena->east = throne;
 	kitchen->west = throne;
+	boudoir->south = dungeon;
+
+	dungeon->west = hall;
 
 	// start the map and the character off in the hall
 	map->start = hall;
@@ -148,7 +168,8 @@ int process_input(Map *game)
 	char ch = getchar();
 	getchar(); // eat ENTER
 
-	int damage = rand() % 4;
+	int damage = rand() % 4 + 1;
+	assert(damage > 0);
 
 	switch(ch) {
 		case -1:
@@ -173,15 +194,27 @@ int process_input(Map *game)
 			break;
 
 		case 'a':
-
 			game->_(attack)(game, damage);
 			break;
+
 		case 'l':
 			printf("You can go:\n");
-			if(game->location->north) printf("NORTH\n");
-			if(game->location->south) printf("SOUTH\n");
-			if(game->location->east) printf("EAST\n");
-			if(game->location->west) printf("WEST\n");
+			if(game->location->north) {
+				printf("NORTH, to ");
+				game->location->north->_(describe)(game->location->north);
+			}
+			if(game->location->south) {
+				printf("SOUTH, to ");
+				game->location->south->_(describe)(game->location->south);
+			}
+			if(game->location->east) {
+				printf("EAST, to ");
+				game->location->east->_(describe)(game->location->east);
+			}
+			if(game->location->west) {
+				printf("WEST, to ");
+				game->location->west->_(describe)(game->location->west);
+			}
 			break;
 
 		default:
@@ -198,6 +231,7 @@ int main(int argc, char *argv[])
 
 	// make our map to work with
 	Map *game = NEW(Map, "The Hall of the Minotaur.");
+	assert(game != NULL);
 
 	printf("You enter the ");
 	game->location->_(describe)(game->location);
