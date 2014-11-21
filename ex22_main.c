@@ -20,6 +20,13 @@ void scope_demo(int count)
 	log_info("count after assign: %d", count);
 }
 
+unsigned long long int recursive(int num, unsigned long long int cur)
+{
+	if(num == 0) return cur;
+	else 
+		return recursive(num - 1, cur + num);
+}
+
 int main(int argc, char *argv[])
 {
 	// test out THE_AGE accessors
@@ -43,12 +50,20 @@ int main(int argc, char *argv[])
 	log_info("Ratio again: %f", update_ratio(10.0));
 	log_info("Ratio once more: %f", update_ratio(300.0));
 
+	double *res = update_ratio_ptr(2.0);
+	log_info("Ratio by pointer: %f\n", *res);
+	*res = 100.0;
+	res = update_ratio_ptr(15.0);
+	log_info("Ratio by pointer: %f\n", *res);
+
 	// test the scope demo
 	int count = 4;
 	scope_demo(count);
 	scope_demo(count * 20);
 
 	log_info("count after calling scope_demo: %d", count);
+
+	log_info("Recursive result: %llu\n", recursive(100000, 0));
 
 	return 0;
 }

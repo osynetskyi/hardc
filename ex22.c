@@ -18,12 +18,24 @@ void set_age(int age)
 
 double update_ratio(double new_ratio)
 {
-	static double ratio = 1.0;
+	static double x = 1.0;	
+	static double *ratio = &x;
 
-	double old_ratio = ratio;
-	ratio = new_ratio;
+	double old_ratio = *ratio;
+	*ratio = new_ratio;
 
 	return old_ratio;
+}
+
+double *update_ratio_ptr(double new_ratio)
+{
+	static double x = 1.0;	
+	static double *ratio = &x;
+
+	log_info("Ration was: %f\n", *ratio);
+	*ratio = new_ratio;
+	
+	return ratio;
 }
 
 void print_size()
