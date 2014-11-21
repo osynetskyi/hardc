@@ -32,7 +32,7 @@ double *update_ratio_ptr(double new_ratio)
 	static double x = 1.0;	
 	static double *ratio = &x;
 
-	log_info("Ration was: %f\n", *ratio);
+	log_info("Ratio was: %f\n", *ratio);
 	*ratio = new_ratio;
 	
 	return ratio;
