@@ -11,6 +11,7 @@ int Shell_exec(Shell template, ...)
 	const char *key = NULL;
 	const char *arg = NULL;
 	int i = 0;
+	int replaced_var = 0;
 
 	rv = apr_pool_create(&p, NULL);
 	check(rv == APR_SUCCESS, "Failed to create pool.");
@@ -26,10 +27,13 @@ int Shell_exec(Shell template, ...)
 		for(i = 0; template.args[i] != NULL; i++) {
 			if(strcmp(template.args[i], key) == 0) {
 				template.args[i] = arg;
+				replaced_var++;
 				break; // found it
 			}
 		}
 	}
+
+	check(replaced_var < template.var_args_cnt, "Looks like you haven't provided all the arguments required.");
 
 	rc = Shell_run(p, &template);
 	apr_pool_destroy(p);
@@ -80,41 +84,48 @@ error:
 Shell CLEANUP_SH = {
 	.exe = "rm",
 	.dir = "/tmp",
-	.args = {"rm", "-rf", "/tmp/pkg-build", "/tmp/pkg-src.tar.gz", "/tmp/pkg-src.tar.bz2", "/tmp/DEPENDS", NULL}
+	.args = {"rm", "-rf", "/tmp/pkg-build", "/tmp/pkg-src.tar.gz", "/tmp/pkg-src.tar.bz2", "/tmp/DEPENDS", NULL},
+	.var_args_cnt = 0
 };
 
 Shell GIT_SH = {
 	.dir = "/tmp",
 	.exe = "git",
-	.args = {"git", "clone", "URL", "pkg-build", NULL}
+	.args = {"git", "clone", "URL", "pkg-build", NULL},
+	.var_args_cnt = 1
 };
 
 Shell TAR_SH = {
 	.dir = "/tmp/pkg-build",
 	.exe = "tar",
-	.args = {"tar", "-xzf", "FILE", "--strip-components", "1", NULL}
+	.args = {"tar", "-xzf", "FILE", "--strip-components", "1", NULL},
+	.var_args_cnt = 1
 };
 
 Shell CURL_SH = {
 	.dir = "/tmp",
 	.exe = "curl",
-	.args = {"curl", "-L", "-o", "TARGET", "URL", NULL}
+	.args = {"curl", "-L", "-o", "TARGET", "URL", NULL},
+	.var_args_cnt = 2
 };
 
 Shell CONFIGURE_SH = {
 	.exe = "./configure",
 	.dir = "/tmp/pkg-build",
-	.args = {"configure", "OPTS", NULL}
+	.args = {"configure", "OPTS", NULL},
+	.var_args_cnt = 1
 };
 
 Shell MAKE_SH = {
 	.exe = "make",
 	.dir = "/tmp/pkg-build",
-	.args = {"make", "OPTS", NULL}
+	.args = {"make", "OPTS", NULL},
+	.var_args_cnt = 1
 };
 
 Shell INSTALL_SH = {
 	.exe = "sudo",
 	.dir = "/tmp/pkg-build",
-	.args = {"sudo", "make", "TARGET", NULL}
+	.args = {"sudo", "make", "TARGET", NULL},
+	.var_args_cnt = 1
 };
