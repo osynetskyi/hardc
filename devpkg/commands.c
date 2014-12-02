@@ -86,7 +86,7 @@ int Command_fetch(apr_pool_t *p, const char *url, int fetch_only)
 			check(rc == 0, "Curl failed.");
 		}
 
-		apr_status_t rc = apr_dir_status_make_recursive(BUILD_DIR,
+		apr_status_t rc = apr_dir_make_recursive(BUILD_DIR,
 				APR_UREAD | APR_UWRITE | APR_UEXECUTE, p);
 
 		check(rc == 0, "Failed to make directory %s", BUILD_DIR);

@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 	apr_pool_create(&p, NULL);
 
 	apr_getopt_t *opt;
-	apr_status_t rc;
+	apr_status_t rv;
 
 	char ch = '\0';
 	const char *optarg = NULL;
