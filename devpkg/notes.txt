@@ -1,0 +1,4 @@
+- identify a program by name, not just url (struct required)
+- do smth about gzip and bzip2 (DRY)
+- apr_initialize()
+- 
