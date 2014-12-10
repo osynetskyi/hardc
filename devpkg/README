@@ -1,0 +1,26 @@
+USAGE: ./devpkg {[-S | -L] NULL } {[-F | -B | -I] url [-c configure_opts | 
+				-m make_opts | -i install_opts]}
+
+DevPkg is a simple package manager developed as a part of "Learn C the Hard Way" 
+course by Zed Shaw. It's primary purpose is to fetch and install packages from 
+source, either in form of tarballs or git repos. 
+DevPkg accepts the following parameters:
+	-S : initialize the packages database kept in /usr/local/.devpkg/db. It also
+		 requires a mandatory dummy parameter, like -S NULL, to function properly.
+	-L : list all the database entries, effectively displaying the list of software
+		 installed by DevPkg. The dummy parameter applies here as well, use -F NULL.
+	-F : recursivey solves all dependencies stored in /tmp/DEPENDS file, installing 
+		 the required packages, then fetches the source from the given url, stores 
+		 it in /tmp/pkg-src and untars (if applicable) to /tmp/pkg-build.
+	-B : fetches the package from the given url and runs ./configure && make && make 
+		 install with the options provided as commandline parameters -c, -m and -i, 
+		 respectively. Also updates the database, adding the record of software installed.
+	-I : performs a check to determine whether the software by the given url has already
+		 been installed, and if not, fetches its source and builds it similar to -B option.
+		 The difference is in performing cleanup after installation. The recommended way
+		 of installing packages.
+
+EXAMPLES:
+	Installing TOR:
+		./devpkg -S NULL
+		./devpkg -I https://dist.torproject.org/tor-0.2.4.23.tar.gz

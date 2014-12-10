@@ -33,7 +33,7 @@ int Shell_exec(Shell template, ...)
 		}
 	}
 
-	check(replaced_var < template.var_args_cnt, "Looks like you haven't provided all the arguments required.");
+	check(replaced_var == template.var_args_cnt, "Looks like you haven't provided all the arguments required.");
 
 	rc = Shell_run(p, &template);
 	apr_pool_destroy(p);

@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
 	const char *url = NULL;
 	enum CommandType request = COMMAND_NONE;
 
-	rv = apr_getopt_init(&opt, p, argc, argv);
+	rv = apr_getopt_init(&opt, p, argc, (const char * const *) argv);
 
-	while(apr_getopt(opt, "I:Lc:m:i:d:SF:B:", &ch, &optarg) == APR_SUCCESS) {
+	while(apr_getopt(opt, "I:L:c:m:i:d:S:F:B:", &ch, &optarg) == APR_SUCCESS) {
 		switch(ch) {
 			case 'I':
 				request = COMMAND_INSTALL;

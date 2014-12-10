@@ -142,7 +142,7 @@ int Command_install (apr_pool_t *p, const char *url, const char *configure_opts,
 	check(Shell_exec(CLEANUP_SH, NULL) == 0, "Failed to cleanup before building.");
 
 	rc = DB_find(url);
-	check(rc == -1, "Error checking the install database.");
+	check(rc != -1, "Error checking the install database.");
 
 	if(rc == 1) {
 		log_info("Package %s is already installed.", url);
