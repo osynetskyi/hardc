@@ -132,7 +132,7 @@ error:
 int DB_remove(const char *url)
 {
 	if(!DB_find(url)) {
-		log_err("Unable to delete: %s, not installed yet", url);
+		log_error("Unable to delete: %s, not installed yet", url);
 	}
 
 	bstring data = DB_load();

@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
 	rv = apr_getopt_init(&opt, p, argc, (const char * const *) argv);
 
-	while(apr_getopt(opt, "I:L:c:m:i:d:S:F:B:", &ch, &optarg) == APR_SUCCESS) {
+	while(apr_getopt(opt, "I:L:c:m:i:d:S:F:B:R:", &ch, &optarg) == APR_SUCCESS) {
 		switch(ch) {
 			case 'I':
 				request = COMMAND_INSTALL;
@@ -63,6 +63,11 @@ int main(int argc, char *argv[])
 				request = COMMAND_BUILD;
 				url = optarg;
 				break;
+			
+			case 'R':
+				request = COMMAND_REMOVE;
+				url = optarg;
+				break;
 		}
 	}
 
@@ -90,6 +95,11 @@ int main(int argc, char *argv[])
 		case COMMAND_INIT:
 			rv = DB_init();
 			check(rv == 0, "Failed to make the database.");
+			break;
+
+		case COMMAND_REMOVE:
+			check(url, "You must at least give an url.");
+			Command_remove(p, url, config_opts); 
 			break;
 
 		default:
