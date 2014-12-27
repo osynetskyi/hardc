@@ -11,11 +11,11 @@ int print_a_message(const char *msg)
 	return 0;
 }
 
-int shiftcase(const char *msg, int length, shiftchar func)
+int shiftcase(const char *msg,/* int length,*/ shiftchar func)
 {
 	int i = 0;
 	
-	for(i = 0; i < length; i++) {
+	for(i = 0; /*i < length*/msg[i] != '\0'; i++) {
 		printf("%c", func(msg[i]));
 	}
 
@@ -24,14 +24,14 @@ int shiftcase(const char *msg, int length, shiftchar func)
 	return 0;
 }
 
-int uppercase(const char *msg, int length)
+int uppercase(const char *msg/*, int length*/)
 {
-	return shiftcase(msg, length, toupper);
+	return shiftcase(msg/*, length*/, toupper);
 }
 
-int lowercase(const char *msg, int length)
+int lowercase(const char *msg/*, int length*/)
 {
-	return shiftcase(msg, length, tolower);
+	return shiftcase(msg/*, length*/, tolower);
 }
 
 int fail_on_purpose(const char *msg)
