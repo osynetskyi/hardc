@@ -20,6 +20,9 @@ typedef struct List {
 	ListNode *last;
 } List;
 
+// comparison function for elements
+typedef int (*compare) (void *a, void *b);
+
 //create a list
 List *List_create();
 
@@ -55,6 +58,18 @@ void *List_shift(List *list);
 
 // remove a node from list
 void *List_remove(List *list, ListNode *node);
+
+// joins two lists together
+void List_join(List *list1, List *list2);
+
+// copy first list to the second, and not just pointers
+void List_copy(List *list1, List *list2);
+
+// split list on element
+int List_split(List *list1, List *list2, void *value, compare fn);
+
+// print list contents
+void List_print(List *list, char *banner);
 
 // cycle through list contents
 #define LIST_FOREACH(L, S, M, V) ListNode *_node = NULL;\
