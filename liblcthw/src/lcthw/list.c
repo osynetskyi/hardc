@@ -175,7 +175,7 @@ void List_join(List *list1, List *list2)
 	}
 }
 
-int List_split(List *list1, List *list2, void *value, compare fn)
+int List_split(List *list1, List *list2, void *value, List_compare fn)
 {
 	check_list(list1);
 	check_list(list2);
@@ -204,7 +204,7 @@ void List_print(List *list, char *banner)
 {
 	printf("%s: ", banner);
 	LIST_FOREACH(list, first, next, cur) {
-		printf("%s ", cur->value);
+		printf("%s ", (char *)cur->value);
 	}
 	printf("\n");
 }

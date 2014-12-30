@@ -105,7 +105,7 @@ char *test_shift()
 
 char *test_split()
 {
-	List_split(another_list, yet_another_list, test2, (compare) strcmp);
+	List_split(another_list, yet_another_list, test2, (List_compare) strcmp);
 	mu_assert(another_list->count == 1, "Invalid first count after split.");
 	mu_assert(yet_another_list->count == 2, "Invalid second count after split.");	
 	

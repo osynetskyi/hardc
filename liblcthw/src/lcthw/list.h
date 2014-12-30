@@ -21,7 +21,7 @@ typedef struct List {
 } List;
 
 // comparison function for elements
-typedef int (*compare) (void *a, void *b);
+typedef int (*List_compare) (void *a, void *b);
 
 //create a list
 List *List_create();
@@ -66,7 +66,7 @@ void List_join(List *list1, List *list2);
 void List_copy(List *list1, List *list2);
 
 // split list on element
-int List_split(List *list1, List *list2, void *value, compare fn);
+int List_split(List *list1, List *list2, void *value, List_compare fn);
 
 // print list contents
 void List_print(List *list, char *banner);
