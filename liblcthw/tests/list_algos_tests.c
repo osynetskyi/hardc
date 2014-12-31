@@ -49,7 +49,7 @@ char *test_bubble_sort()
 	// should work on empty list
 	words = List_create(words);
 	rc = List_bubble_sort(words, (List_compare)strcmp);
-	mu_assert(rc == 0, "Bubble sort failed on emprty list.");
+	mu_assert(rc == 0, "Bubble sort failed on empty list.");
 	mu_assert(is_sorted(words), "Words should be sorted if empty.");
 
 	List_destroy(words);

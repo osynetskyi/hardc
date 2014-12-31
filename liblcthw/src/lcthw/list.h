@@ -26,6 +26,9 @@ typedef int (*List_compare) (void *a, void *b);
 //create a list
 List *List_create();
 
+// check list for validity
+void List_check(List *list);
+
 //free memory from list structures
 void List_destroy(List *list);
 
@@ -60,10 +63,10 @@ void *List_shift(List *list);
 void *List_remove(List *list, ListNode *node);
 
 // joins two lists together
-void List_join(List *list1, List *list2);
+List *List_join(List *list1, List *list2);
 
 // copy first list to the second, and not just pointers
-void List_copy(List *list1, List *list2);
+List *List_copy(List *list);//1, List *list2);
 
 // split list on element
 int List_split(List *list1, List *list2, void *value, List_compare fn);

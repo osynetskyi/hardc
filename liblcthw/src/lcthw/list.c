@@ -7,7 +7,7 @@ List *List_create()
 	return calloc(1, sizeof(List));
 }
 
-void check_list(List *list)
+void List_check(List *list)
 {
 	assert(list != NULL);
 	assert(list->count >= 0);
@@ -27,7 +27,7 @@ void check_list(List *list)
 
 void List_destroy(List *list)
 {
-	check_list(list);
+	List_check(list);
 	LIST_FOREACH(list, first, next, cur) {
 		if(cur->prev) {
 			free(cur->prev);
@@ -40,26 +40,34 @@ void List_destroy(List *list)
 
 void List_clear(List *list)
 {
-	check_list(list);
+	List_check(list);
 	LIST_FOREACH(list, first, next, cur) {
+		//printf("ptr: %p\n", cur->value);
 		free(cur->value);
 	}
 }
 
 void List_clear_destroy(List *list)
 {
-	check_list(list);
+	List_check(list);
 	LIST_FOREACH(list, first, next, cur) {
+		//printf("Freeing val %s %p\n", cur->value, cur->value);
+		free(cur->value);
 		if(cur->prev) {
+			//printf("Freeing prev: %p\n", cur->prev);
 			free(cur->prev);
 		}		
-		free(cur->value);
 	}
+
+	//printf("Freeing last: %p\n", list->last);
+	free(list->last);
+	//printf("Freeing list: %p\n", list);
+	free(list);
 }
 
 void List_push(List *list, void *value)
 {
-	check_list(list);
+	List_check(list);
 	ListNode *node = calloc(1, sizeof(ListNode));
 	check_mem(node);
 
@@ -82,14 +90,14 @@ error:
 
 void *List_pop(List *list)
 {
-	check_list(list);
+	List_check(list);
 	ListNode *node = list->last;
 	return node != NULL ? List_remove(list, node) : NULL;
 }
 
 void List_unshift(List *list, void *value)
 {
-	check_list(list);
+	List_check(list);
 	ListNode *node = calloc(1, sizeof(ListNode));
 	check_mem(node);
 
@@ -112,14 +120,14 @@ error:
 
 void *List_shift(List *list)
 {
-	check_list(list);
+	List_check(list);
 	ListNode *node = list->first;
 	return node != NULL ? List_remove(list, node) : NULL;
 }
 
 void *List_remove(List *list, ListNode *node)
 {
-	check_list(list);
+	List_check(list);
 	void *result = NULL;
 
 	check(list->first && list->last, "List is empty.");
@@ -151,34 +159,39 @@ error:
 	return result; 
 }
 
-void List_copy(List *list1, List *list2)
+List *List_copy(List *list)
 {
-	check_list(list1);
-	//check_list(list2);
-	LIST_FOREACH(list1, first, next, cur) {
-		List_push(list2, cur->value);
+	List_check(list);
+	List *res = List_create();
+	LIST_FOREACH(list, first, next, cur) {
+		List_push(res, strdup(cur->value));
 	}
-	
+
+	return res;	
 }
 
-void List_join(List *list1, List *list2)
+List *List_join(List *list1, List *list2)
 {
-	check_list(list1);
-	check_list(list2);
-	if((list1->first == NULL)&&(list2->first != NULL)) {
-		List_join(list2, list1);		
-	} else if(list2->first != NULL) {
-		list1->last->next = list2->first;
-		list2->first->prev = list1->last;
-		list1->last = list2->last;
-		list1->count += list2->count;	
+	List_check(list1);
+	List_check(list2);
+	List *res = NULL;
+
+	if(list1->first == NULL) {
+		res = List_copy(list2);
+	} else {
+		res = List_copy(list1);
+		LIST_FOREACH(list2, first, next, cur) {
+			List_push(res, strdup(cur->value));
+		}
 	}
+	
+	return res;
 }
 
 int List_split(List *list1, List *list2, void *value, List_compare fn)
 {
-	check_list(list1);
-	check_list(list2);
+	List_check(list1);
+	List_check(list2);
 	int k = list1->count;
 	int n = 0;
 	ListNode *oldlast = list1->last;
@@ -208,3 +221,22 @@ void List_print(List *list, char *banner)
 	}
 	printf("\n");
 }
+
+/*int main(int argc, char *argv[])
+{
+	List *a = List_create();
+	//List *b = List_create();
+	char *test1 = strdup("abc");
+	List_push(a, test1);
+	List_push(a, strdup("def"));
+	List_push(b, "ghi");
+	List *c = List_copy(a, b);
+	List_print(c, "c");
+	List_clear_destroy(c);
+	List_destroy(a);
+	List_destroy(b);
+	List_print(a, "a");
+	List_clear_destroy(a);
+
+	return 0;
+}*/

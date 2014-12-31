@@ -22,6 +22,8 @@ char *test_create()
 char *test_destroy()
 {
 	List_clear_destroy(list);
+	List_clear_destroy(another_list);
+	List_clear_destroy(yet_another_list);
 
 	return NULL;
 }
@@ -66,15 +68,6 @@ char *test_unshift()
 	return NULL;
 }
 
-char *test_copy()
-{
-	List_copy(list, another_list);
-	mu_assert(List_count(another_list) == 3, "Wrong count after copy.");
-	//mu_assert();
-
-	return NULL;
-}
-
 char *test_remove()
 {
 	// we only need to test the middle remove case since push/shift
@@ -103,19 +96,39 @@ char *test_shift()
 	return NULL;
 }
 
-char *test_split()
+char *test_copy()
+{
+	List *test = List_copy(list);
+	mu_assert(List_count(test) == 3, "Wrong count after copy.");
+	//mu_assert(strcmp(list->first->value, test->first->value) == 0, "Wrong first value copied.");
+	List_clear_destroy(test);
+
+	return NULL;
+}
+
+/*char *test_split()
 {
 	List_split(another_list, yet_another_list, test2, (List_compare) strcmp);
 	mu_assert(another_list->count == 1, "Invalid first count after split.");
 	mu_assert(yet_another_list->count == 2, "Invalid second count after split.");	
 	
 	return NULL;
-}
+}*/
 
 char *test_join()
 {
-	List_join(another_list, yet_another_list);
-	mu_assert(another_list->count == 3, "Wrong count after join.");
+	List *a = List_create();
+	List_push(a, strdup("abc"));
+	List_push(a, strdup("def"));
+	List *b = List_create();
+	List_push(b, strdup("ghi"));
+	List *test = List_join(a, b);
+	mu_assert(List_count(test) == 3, "Wrong count after join.");
+	//mu_assert(strcmp(test->first->value, "abc") == 0, "Wrong first after join.");
+	List_clear_destroy(test);
+	List_clear_destroy(a);
+	List_clear_destroy(b);
+	
 	return NULL;
 }
 
@@ -126,7 +139,7 @@ char *all_tests() {
 	mu_run_test(test_push_pop)
 	mu_run_test(test_unshift);
 	mu_run_test(test_copy);
-	mu_run_test(test_split);
+	//mu_run_test(test_split);
 	mu_run_test(test_join);
 	mu_run_test(test_remove);
 	mu_run_test(test_shift);
