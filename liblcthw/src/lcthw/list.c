@@ -188,14 +188,37 @@ List *List_join(List *list1, List *list2)
 	return res;
 }
 
-int List_split(List *list1, List *list2, void *value, List_compare fn)
+int List_split(List *original, List *half1, List *half2)
 {
-	List_check(list1);
-	List_check(list2);
-	int k = list1->count;
-	int n = 0;
-	ListNode *oldlast = list1->last;
-	LIST_FOREACH(list1, first, next, cur) {
+	List_check(original);
+	List_check(half1);
+	List_check(half2);
+	assert(original->first != NULL);
+	assert(List_count(original) > 1);
+	List_clear(half1);
+	List_clear(half2);
+	//half1 = List_create();
+	//half2 = List_create();
+	int count = List_count(original);
+	int half = count / 2;	
+	int i = 0;
+	ListNode *cur = original->first;
+
+	while(i < half) {
+		List_push(half1, strdup(cur->value));
+		cur = cur->next;
+		i++;
+	}
+	
+	while(i < count) {
+		List_push(half2, strdup(cur->value));
+		cur = cur->next;
+		i++;
+	}
+
+	return 0;
+	
+	/*LIST_FOREACH(list1, first, next, cur) {
 		if(fn(cur->value, value) == 0) {
 			list1->last = cur->prev;
 			list1->last->next = NULL;
@@ -210,7 +233,7 @@ int List_split(List *list1, List *list2, void *value, List_compare fn)
 		}
 	}
 
-	return -1;
+	return -1;*/
 }
 
 void List_print(List *list, char *banner)

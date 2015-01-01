@@ -68,8 +68,8 @@ List *List_join(List *list1, List *list2);
 // copy first list to the second, and not just pointers
 List *List_copy(List *list);//1, List *list2);
 
-// split list on element
-int List_split(List *list1, List *list2, void *value, List_compare fn);
+// split list in two halves
+int List_split(List *original, List *half1, List *half2);
 
 // print list contents
 void List_print(List *list, char *banner);

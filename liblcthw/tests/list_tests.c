@@ -3,8 +3,6 @@
 #include <assert.h>
 
 static List *list = NULL;
-static List *another_list = NULL;
-static List *yet_another_list = NULL;
 char *test1 = "test1 data";
 char *test2 = "test2 data";
 char *test3 = "test3 data";
@@ -12,8 +10,6 @@ char *test3 = "test3 data";
 char *test_create()
 {
 	list = List_create();
-	another_list = List_create();
-	yet_another_list = List_create();
 	mu_assert(list != NULL, "Failed to create list.");
 
 	return NULL;
@@ -22,8 +18,6 @@ char *test_create()
 char *test_destroy()
 {
 	List_clear_destroy(list);
-	List_clear_destroy(another_list);
-	List_clear_destroy(yet_another_list);
 
 	return NULL;
 }
@@ -106,14 +100,18 @@ char *test_copy()
 	return NULL;
 }
 
-/*char *test_split()
+char *test_split()
 {
-	List_split(another_list, yet_another_list, test2, (List_compare) strcmp);
-	mu_assert(another_list->count == 1, "Invalid first count after split.");
-	mu_assert(yet_another_list->count == 2, "Invalid second count after split.");	
+	List *a = List_create();
+	List *b = List_create();
+	List_split(list, a, b);
+	mu_assert(List_count(a) == 1, "Invalid first count after split.");
+	mu_assert(List_count(b) == 2, "Invalid second count after split.");
+	List_clear_destroy(a);
+	List_clear_destroy(b);
 	
 	return NULL;
-}*/
+}
 
 char *test_join()
 {
@@ -139,7 +137,7 @@ char *all_tests() {
 	mu_run_test(test_push_pop)
 	mu_run_test(test_unshift);
 	mu_run_test(test_copy);
-	//mu_run_test(test_split);
+	mu_run_test(test_split);
 	mu_run_test(test_join);
 	mu_run_test(test_remove);
 	mu_run_test(test_shift);
