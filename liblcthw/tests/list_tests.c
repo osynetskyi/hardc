@@ -92,7 +92,8 @@ char *test_shift()
 
 char *test_copy()
 {
-	List *test = List_copy(list);
+	List *test = List_create();
+	List_copy(list, test);
 	mu_assert(List_count(test) == 3, "Wrong count after copy.");
 	//mu_assert(strcmp(list->first->value, test->first->value) == 0, "Wrong first value copied.");
 	List_clear_destroy(test);
@@ -120,7 +121,8 @@ char *test_join()
 	List_push(a, strdup("def"));
 	List *b = List_create();
 	List_push(b, strdup("ghi"));
-	List *test = List_join(a, b);
+	List *test = List_create();
+	List_join(a, b, test);
 	mu_assert(List_count(test) == 3, "Wrong count after join.");
 	//mu_assert(strcmp(test->first->value, "abc") == 0, "Wrong first after join.");
 	List_clear_destroy(test);

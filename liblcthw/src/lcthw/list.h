@@ -63,10 +63,10 @@ void *List_shift(List *list);
 void *List_remove(List *list, ListNode *node);
 
 // joins two lists together
-List *List_join(List *list1, List *list2);
+int List_join(List *list1, List *list2, List *res);
 
 // copy first list to the second, and not just pointers
-List *List_copy(List *list);//1, List *list2);
+int List_copy(List *list, List *res);
 
 // split list in two halves
 int List_split(List *original, List *half1, List *half2);

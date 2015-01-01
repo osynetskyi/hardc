@@ -159,33 +159,36 @@ error:
 	return result; 
 }
 
-List *List_copy(List *list)
+int List_copy(List *list, List *res)
 {
 	List_check(list);
-	List *res = List_create();
+	List_check(res);
+	List_clear(res);
+	
 	LIST_FOREACH(list, first, next, cur) {
 		List_push(res, strdup(cur->value));
 	}
 
-	return res;	
+	return 0;	
 }
 
-List *List_join(List *list1, List *list2)
+int List_join(List *list1, List *list2, List *res)
 {
 	List_check(list1);
 	List_check(list2);
-	List *res = NULL;
+	List_check(res);
+	List_clear(res);
 
 	if(list1->first == NULL) {
-		res = List_copy(list2);
+		List_copy(list2, res);
 	} else {
-		res = List_copy(list1);
+		List_copy(list1, res);
 		LIST_FOREACH(list2, first, next, cur) {
 			List_push(res, strdup(cur->value));
 		}
 	}
 	
-	return res;
+	return 0;
 }
 
 int List_split(List *original, List *half1, List *half2)
@@ -197,8 +200,6 @@ int List_split(List *original, List *half1, List *half2)
 	assert(List_count(original) > 1);
 	List_clear(half1);
 	List_clear(half2);
-	//half1 = List_create();
-	//half2 = List_create();
 	int count = List_count(original);
 	int half = count / 2;	
 	int i = 0;
@@ -217,23 +218,6 @@ int List_split(List *original, List *half1, List *half2)
 	}
 
 	return 0;
-	
-	/*LIST_FOREACH(list1, first, next, cur) {
-		if(fn(cur->value, value) == 0) {
-			list1->last = cur->prev;
-			list1->last->next = NULL;
-			list2->first = cur;
-			list2->first->prev = NULL;
-			list2->last = oldlast;
-			list1->count = n;
-			list2->count = k - n;
-			return 0;
-		} else {
-			n++;
-		}
-	}
-
-	return -1;*/
 }
 
 void List_print(List *list, char *banner)
