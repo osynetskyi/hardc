@@ -7,6 +7,6 @@
 
 int List_bubble_sort(List *list, List_compare fn);
 
-int List_merge_sort(List *list, List_compare fn);
+List *List_merge_sort(List *list, List_compare fn);
 
 #endif
