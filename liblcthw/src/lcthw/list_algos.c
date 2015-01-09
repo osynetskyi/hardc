@@ -173,8 +173,37 @@ int List_insert_sorted(List *list, void* value, List_compare fn)
 	node->next = before->next;
 	before->next->prev = node;
 	before->next = node;
+	list->count += 1;
 	return 0;
 
 error:
 	return -1;
+}
+
+List *List_merge_sort_up(List *list, List_compare cmp)
+{
+	List_check(list);
+	int count = List_count(list);
+	int width = 1;
+	int i = 0;
+	List **work = calloc(1, sizeof(List) * count);
+	LIST_FOREACH(list, first, next, cur) {
+		work[i] = List_create();
+		List_push(work[i], cur->value);
+		i++;
+	}
+
+	for(width = 1; width < count; width = width * 2) {
+		for(i = 0; i < count; i = i + 2*width) {
+			if(i + width < count) {
+				work[i] = List_merge(work[i], work[i + width], cmp);
+			}
+		}
+	}
+
+	for(i = 1; i < count; i++) {
+		if(work[i]) free(work[i]);
+	}
+
+	return work[0];
 }
