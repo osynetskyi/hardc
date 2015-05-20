@@ -59,11 +59,16 @@ error:
 // test for big number of elements
 static char *test_operations()
 {
-	size_t N = 200;
+	size_t N = 20000;
 
+	clock_t start = clock();
 	RadixMap *map = RadixMap_create(N);
 	mu_assert(map != NULL, "Failed to make the map.");
 	mu_assert(make_random(map), "Didn't make a random fake radix map.");
+
+	clock_t end = clock();
+	double seconds = (double)(end - start) / CLOCKS_PER_SEC;
+	printf("Creating RadixMap with %d elements took %f sec\n", N, seconds);
 
 	RadixMap_sort(map);
 	mu_assert(check_order(map), "Failed to properly sort the RadixMap.");

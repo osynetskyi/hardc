@@ -77,6 +77,17 @@ void RadixMap_sort(RadixMap *map)
 	radix_sort(3, map->end, temp, source);
 }
 
+void RadixMap_partial_sort(RadixMap *map, int start, int total)
+{
+	uint64_t *source = &map->contents[start].raw;
+	uint64_t *temp = &map->temp[start].raw;
+
+	radix_sort(0, total, source, temp);
+	radix_sort(1, total, temp, source);
+	radix_sort(2, total, source, temp);
+	radix_sort(3, total, temp, source);
+}
+
 RMElement *RadixMap_find(RadixMap *map, uint32_t to_find)
 {
 	int low = 0;
@@ -99,6 +110,28 @@ RMElement *RadixMap_find(RadixMap *map, uint32_t to_find)
 	return NULL;
 }
 
+int RadixMap_find_closest(RadixMap *map, uint32_t to_find)
+{
+	int low = 0;
+	int high = map->end - 1;
+	RMElement *data = map->contents;
+
+	while (low <= high) {
+		int middle = low + (high - low)/2;
+		uint32_t key = data[middle].data.key;
+
+		if (to_find < key) {
+			high = middle - 1;
+		} else if (to_find > key) {
+			low = middle + 1;
+		} else {
+			return middle;
+		}
+	}
+
+	return low;
+}
+
 int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value)
 {
 	check(key < UINT32_MAX, "Key can't be equal to UINT32_MAX.");
@@ -106,9 +139,13 @@ int RadixMap_add(RadixMap *map, uint32_t key, uint32_t value)
 	RMElement element = {.data = {.key = key, .value = value}};
 	check(map->end + 1 < map->max, "RadixMap is full.");
 
+	int found = RadixMap_find_closest(map, key);
+
 	map->contents[map->end++] = element;
 
-	RadixMap_sort(map);
+	RadixMap_partial_sort(map, found, map->end - found);
+
+	//RadixMap_sort(map);
 
 	return 0;
 
