@@ -9,7 +9,7 @@ int testcmp(char **a, char **b)
 DArray *create_words()
 {
 	DArray *result = DArray_create(0, 5);
-	char *words[] = {"asdfasfd", "werwar", "13234", "asdfasfd", "oioj"};
+	char *words[] = {"asdfasfd", "werwar", "13234", "xasdfasfd", "oioj"};
 	int i = 0;
 
 	for(i = 0; i < 5; i++) {
@@ -62,6 +62,39 @@ char *test_mergesort()
 	return run_sort_test(DArray_mergesort, "mergesort");
 }
 
+char *test_sort_add()
+{
+	DArray *words = create_words();
+	DArray_qsort(words, (DArray_compare)testcmp);
+	char *words2[] = {"twiggy", "pwnod", "asd13234", "kukareku", "9_("};
+	int i = 0;
+
+	for(i = 0; i < 5; i++) {
+		DArray_sort_add(words, words2[i], (DArray_compare)testcmp);
+		mu_assert(is_sorted(words), "Words should be sorted.");
+	}
+
+	DArray_destroy(words);
+
+	return NULL;
+}
+
+char *test_find()
+{
+	DArray *words = create_words();
+	DArray_qsort(words, (DArray_compare)testcmp);
+	
+	int res = DArray_find(words, "werwar", (DArray_compare)strcmp);
+	mu_assert(res == 3, "Element is not there, but should be.");
+
+	res = DArray_find(words, "wasderwar", (DArray_compare)strcmp);
+	mu_assert(res == -1, "Element is there, but shouldn't be.");
+
+	DArray_destroy(words);
+
+	return NULL;
+}
+
 char *all_tests()
 {
 	mu_suite_start();
@@ -69,6 +102,8 @@ char *all_tests()
 	mu_run_test(test_qsort);
 	mu_run_test(test_heapsort);
 	mu_run_test(test_mergesort);
+	mu_run_test(test_sort_add);
+	mu_run_test(test_find);
 
 	return NULL;
 }
